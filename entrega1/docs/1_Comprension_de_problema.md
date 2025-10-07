@@ -7,8 +7,8 @@ Este documento establece el marco estratégico del proyecto. Define el problema 
 ## 1. Definición del Problema
 Desarrollar, en un periodo de 5 semanas, una herramienta de software capaz de detectar y clasificar automáticamente cinco actividades humanas específicas (caminar hacia la cámara, caminar de regreso, girar, sentarse y ponerse de pie) a partir de video en tiempo real, mediante el análisis de poses y seguimiento de articulaciones, alcanzando una precisión mínima del 85% en la clasificación de las actividades para validar su uso potencial en contextos de fisioterapia, deporte y ergonomía.
 
-*   **Tipo de Problema:** Desde una perspectiva de Machine Learning, este es un problema de **clasificación supervisada de series temporales multivariadas**.
-    *   **Clasificación Supervisada:** Entrenaremos un modelo con datos previamente etiquetados (videos con la actividad correcta) para que aprenda a asignar una categoría a datos nuevos.
+*   **Tipo de Problema:** Desde una perspectiva de Machine Learning, este es un problema de **clasificación multiclase supervisada de series temporales multivariadas**.
+    *   **Clasificación Multiclase Supervisada:** Entrenaremos un modelo con datos previamente etiquetados (videos con la actividad correcta) para que aprenda a asignar una categoría  entre varias a datos nuevos.
     *   **Series Temporales Multivariadas:** La entrada del modelo no será una imagen estática, sino una secuencia de datos a lo largo del tiempo (los frames del video). Es multivariada porque en cada instante de tiempo tenemos múltiples valores (las coordenadas x, y, z de todas las articulaciones).
 
 ## 2. Preguntas de Interés
@@ -36,18 +36,24 @@ Para medir el rendimiento de nuestros modelos y el éxito del proyecto, utilizar
 La implementación de una solución de IA que analiza personas conlleva responsabilidades éticas. Se han identificado los siguientes aspectos a considerar:
 
 *   **Privacidad y Consentimiento:**
-    *   **Problema:** El sistema procesa imágenes de personas. Es crucial garantizar la privacidad de los individuos grabados.
-    *   **Mitigación:** Para este proyecto, todos los datos serán recolectados de los miembros del grupo, quienes darán su consentimiento explícito. No se utilizarán imágenes de terceros sin permiso. Los datos no se compartirán públicamente.
+    *   **Problema:** El sistema procesa imágenes de personas. Es crucial garantizar la privacidad de los individuos grabados. [1]
+    *   **Mitigación:** Para este proyecto, todos los datos serán recolectados de los miembros del grupo, quienes darán su consentimiento explícito para participar en la investigación. No se utilizarán imágenes de terceros sin permiso, y los datos no se compartirán públicamente, asegurando la confidencialidad y el respeto a la autonomía de los participantes,.
 
 *   **Sesgos (Bias) en el Modelo:**
     *   **Problema:** Si los datos de entrenamiento provienen de un grupo demográfico homogéneo (ej., solo hombres jóvenes de una misma etnia), el modelo podría funcionar mal para otros grupos (mujeres, personas mayores, diferentes tipos de cuerpo).
-    *   **Mitigación:** Aunque el alcance del proyecto es limitado, se intentará que los datos recolectados incluyan variaciones en la vestimenta y la forma de realizar los movimientos para promover la generalización. En el informe final se documentará esta limitación.
+    *   **Mitigación:** Aunque el alcance del proyecto es limitado, se intentará que los datos recolectados incluyan variaciones en la vestimenta y la forma de realizar los movimientos para promover la generalización. En el informe final se documentará esta limitación, una práctica recomendada para abordar la equidad y la justicia en los sistemas de visión por computadora.
 
 *   **Uso Indebido de la Tecnología:**
     *   **Problema:** Una tecnología como esta podría ser utilizada para la vigilancia o el monitoreo de personas sin su consentimiento.
-    *   **Mitigación:** El proyecto se enmarca en un contexto académico y con fines de aprendizaje. El código y los resultados se presentarán de forma transparente, discutiendo tanto sus capacidades como sus limitaciones y potenciales riesgos.
+    *   **Mitigación:** El proyecto se enmarca en un contexto académico y con fines de aprendizaje. El código y los resultados se presentarán de forma transparente, discutiendo tanto sus capacidades como sus limitaciones y potenciales riesgos, fomentando un uso responsable de la tecnología y previniendo su aplicación en contextos perjudiciales.
 
 ## 6. Siguientes Pasos
 1.  **Recolección de Datos:** Proceder con la captura del conjunto de datos inicial según el protocolo definido.
 2.  **Análisis Exploratorio:** Realizar un primer análisis de los videos recolectados para entender su calidad y variabilidad.
 3.  **Pre-procesamiento:** Desarrollar los scripts iniciales para extraer los landmarks de los videos usando MediaPipe.
+
+
+### Referencias
+ M. K. Lee, J. T. Biega, A. L. Cunliffe, D. Williams, D. Schmit, y T. K. Lee, “A Contextual Ethics Framework for Human Participant AI Research,” *arXiv preprint arXiv:2311.01254*, 2023.
+
+ S. Sharma y S. Singh, “Ethical Considerations in Artificial Intelligence: A Comprehensive Discussion from the Perspective of Computer Vision,” en *2023 3rd International Conference on Advance Computing and Innovative Technologies in Engineering (ICACITE)*, 2023, pp. 1812–1817. doi: 10.1109/ICACITE57410.2023.10182607.
