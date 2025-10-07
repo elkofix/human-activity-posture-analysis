@@ -1,38 +1,24 @@
-____________________________________________________________________________________
+# Human Activity and Posture Analysis System
+This project is a part of the  **Inteligencia Artificial I** course in the Systems Engineering Degree, Universidad Icesi, Cali Colombia. 
 
-
-# Project Template
-This is the template for the Project I course at the IA Master, Universidad Icesi, Cali Colombia
-
-This template is based on the template proposed by the [Data Science Working Group] (https://github.com/sfbrigade/data-science-wg) Code for the [San Francisco’s Code initiative](https://github.com/sfbrigade/data-science-wg) 
-
-*Instructions: Edit this template filling in the titles, information, and links! Feel free to stray a bit to suit your project but try to provide the main information for reviews and feedback purposes.*
-## Remove this table after updating your project's information
-____________________________________________________________________________________
-
-# Project Name
-This project is a part of the  **Proyecto 1 de Innovación Tecnológica** course in the Applied Artificial Intelligence Master, Universidad Icesi, Cali Colombia. 
-
-#### -- Project Status: [Active, On-Hold, Completed]
+#### -- Project Status: Active
 
 ## Contributing Members
 
-**Team Leader: [Full Name](https://github.com/[github handle])(@slackHandle)**
-**Instructor: [Full Name](https://github.com/[github handle])(@slackHandle)**
+**Student: [Alejandro Cordoba Erazo](https://github.com/elkofix)**
 
-#### Other Members:
+**Student: [Stick Martinez](https://github.com/Stixkl])**
 
-|Name     |  Email   | 
-|---------|-----------------|
-|[Full Name](https://github.com/[github handle])| @johnDoe        |
-|[Full Name](https://github.com/[github handle]) |     @janeDoe    |
+**Student: [Johan Sebastian Diaz](https://github.com/JohanDiaz9021)**
+
+**Instructor: [Milton Sarria Paja](https://github.com/miltonsarria])**
 
 ## Contact
-* Feel free to contact the team leader or the instructor with any questions or if you are interested in contributing!
+* Feel free to contact any student or the instructor with any questions or if you are interested in contributing!
 
 
 ## Project Intro/Objective
-The purpose of this project is ________. (Describe the main goals of the project and potential civic impact. Limit to a short paragraph, 3-6 Sentences)
+The purpose of this project is to develop a real-time human activity and posture analysis system capable of recognizing key movements such as walking, turning, sitting, and standing. Using computer vision and pose estimation techniques (via MediaPipe), the system tracks human joints to analyze posture, joint angles, and lateral inclinations. The project aims to provide an intelligent tool for movement annotation and classification, useful in areas such as health monitoring, sports performance, and ergonomic assessment. By combining data collection, annotation, and supervised learning models, the system seeks to improve accuracy in detecting human activities in diverse real-world conditions.
 
 ### Partner
 This section should be added when there's a partner institution 
