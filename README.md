@@ -62,7 +62,7 @@ Instructions for contributors
 5. Follow setup [instructions](Link to file)
 
 ## Featured Notebooks/Analysis/Deliverables
-* [Notebook/Markdown/Slide Deck Title](link)
+* [Entrega 1](/entrega1/docs/README.md)
 * [Notebook/Markdown/Slide DeckTitle](link)
 * [Blog Post](link)
 
