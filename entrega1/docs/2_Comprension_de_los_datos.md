@@ -136,3 +136,11 @@ Para llevar a cabo la recolección de datos, se seguirá el siguiente plan:
     *   **Condiciones de Iluminación:** Se capturarán videos bajo distintas condiciones de luz (natural, artificial) para mejorar la robustez del modelo.
 3.  **Especificaciones Técnicas:** Para mantener la consistencia, los videos se grabarán con una resolución y tasa de fotogramas (FPS) similares a las del dataset original.
 4.  **Organización y Etiquetado:** Los nuevos videos se organizarán en la misma estructura de carpetas por categoría para facilitar su integración y procesamiento junto con el dataset original.
+
+## 4. Implementación Técnica y Código Fuente
+
+Todo el proceso de análisis exploratorio, desde la carga de datos hasta la visualización y extracción de características con MediaPipe, se encuentra documentado y ejecutado en un notebook de Google Colab. Este documento sirve como una referencia técnica detallada y permite la reproducibilidad de los resultados presentados en este informe.
+
+Para consultar el código, los pasos detallados y los resultados completos, acceda al siguiente enlace:
+
+- [**Ver el Notebook de Análisis Exploratorio en Google Colab**](https://github.com/elkofix/human-activity-posture-analysis/blob/d7f7a4dd517ed76f7330e82a2d1dd68b881a6921/entrega1/notebooks/Analisis_exploratorio_de_datos_Entrega1.ipynb)
