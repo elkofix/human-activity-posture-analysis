@@ -15,17 +15,16 @@ Desarrollar, en un periodo de 5 semanas, una herramienta de software capaz de de
 Las siguientes preguntas de interés guiarán nuestra investigación y desarrollo:
 
 1.  **Pregunta Central:** ¿Es factible clasificar con alta precisión un conjunto de actividades humanas y cuantificar métricas posturales en tiempo real, utilizando únicamente los datos de landmarks corporales extraídos de un video?
-2.  **Pregunta de Modelado:** ¿En X semanas es posible identificar cuál de los modelos de clasificación supervisada (SVM, Random Forest, XGBoost) es el mejor modelo para la tarea de detección de actividades humanas, en términos de: ?
-3.  **Pregunta de Características:** Para un conjunto de datos de video recopilado durante 5 días, ¿cuál es el ranking de importancia de las características cinemáticas (ángulos de rodilla/cadera, velocidad angular del torso, y distancia vertical cadera-tobillo) extraídas con MediaPipe, medido por su capacidad para que un modelo de clasificación simple (como un Árbol de Decisión) alcance la máxima precisión al diferenciar entre 'caminar', 'girar', 'sentarse' y 'ponerse de pie' al final de una semana de trabajo?
+2.  **Pregunta de Modelado:** ¿En 4 semanas es posible identificar cuál de los modelos de clasificación supervisada (SVM, Random Forest, XGBoost) es el mejor modelo para la tarea de detección de actividades humanas, en términos de: ?
+3.  **Pregunta de Características:** Para un conjunto de datos de video recopilado durante 5 días, ¿cuál es el ranking de importancia de las características cinemáticas (ángulos de rodilla/cadera, velocidad angular del torso, y distancia vertical cadera-tobillo) extraídas con MediaPipe, medido por su capacidad para que un modelo de clasificación simple (como un Árbol de Decisión) alcance la máxima precisión al diferenciar entre 'caminar' (hacia adelante o atrás), 'girar', 'sentarse' y 'ponerse de pie' al final de una semana de trabajo?
 
 ## 4. Métricas de Progreso
 Para medir el rendimiento de nuestros modelos y el éxito del proyecto, utilizaremos las siguientes métricas:
 
 *   **Métricas de Clasificación Primarias:**
-    *   **F1-Score:** Es la métrica principal, ya que proporciona un balance entre Precisión y Recall, siendo robusta ante desbalances de clases (si tuviéramos más ejemplos de una actividad que de otra).
     *   **Matriz de Confusión:** Para visualizar en qué actividades específicas el modelo está fallando.
-    *   **Precisión (Precision):** De todas las veces que el modelo predijo una actividad, ¿cuántas veces acertó?
-    *   **Exhaustividad (Recall):** De todas las veces que una actividad ocurrió realmente, ¿cuántas veces el modelo la detectó?
+    *   **Precisión de cada(Precision):** De todas las veces que el modelo predijo una actividad, ¿cuántas veces acertó?
+    *   **Exhaustividad de cada clase (Recall):** De todas las veces que una actividad ocurrió realmente, ¿cuántas veces el modelo la detectó?
 
 *   **Métrica de Rendimiento Técnico:**
     *   **Latencia de Inferencia (o FPS):** Mediremos el tiempo que tarda el sistema en procesar un frame y mostrar el resultado. El objetivo es mantener una tasa de frames por segundo (FPS) que permita una experiencia fluida en tiempo real.
@@ -36,7 +35,7 @@ Para medir el rendimiento de nuestros modelos y el éxito del proyecto, utilizar
 La implementación de una solución de IA que analiza personas conlleva responsabilidades éticas. Se han identificado los siguientes aspectos a considerar:
 
 *   **Privacidad y Consentimiento:**
-    *   **Problema:** El sistema procesa imágenes de personas. Es crucial garantizar la privacidad de los individuos grabados. [1]
+    *   **Problema:** El sistema procesa imágenes de personas. Es crucial garantizar la privacidad de los individuos grabados.
     *   **Mitigación:** Para este proyecto, todos los datos serán recolectados de los miembros del grupo, quienes darán su consentimiento explícito para participar en la investigación. No se utilizarán imágenes de terceros sin permiso, y los datos no se compartirán públicamente, asegurando la confidencialidad y el respeto a la autonomía de los participantes,.
 
 *   **Sesgos (Bias) en el Modelo:**
