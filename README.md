@@ -63,6 +63,7 @@ Instructions for contributors
 
 ## Featured Notebooks/Analysis/Deliverables
 * [Entrega 1](/entrega1/docs/README.md)
+* [Entrega 1](/entrega1/docs/README.md)
 * [Notebook/Markdown/Slide DeckTitle](link)
 * [Blog Post](link)
 
