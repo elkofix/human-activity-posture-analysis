@@ -1,4 +1,4 @@
-### **2: Modelado (Fase 4 CRISP-DM)**
+### **Fase 4: Modelado**
 
 #### **1. Introducción al Modelado**
 

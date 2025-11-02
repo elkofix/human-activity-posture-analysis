@@ -1,4 +1,4 @@
-### **1: Preparación de los Datos (Fase 3 CRISP-DM)**
+### **Fase 3: Preparación de los Datos**
 
 #### **1. Introducción a la Preparación de Datos**
 
