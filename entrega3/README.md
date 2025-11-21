@@ -1,11 +1,17 @@
 # How to run the project
 
+0. Make sure you have python 3.12 installed you can check that with
+
+```sh
+py -0p
+```
+
 1. Open a console in the folder `/entrega3/human-activity-an/`
 
 2. Create a python virtual environment with
 
 ```sh
-python -m venv venv
+py -3.12 -m venv venv
 ```
 
 3. Activate the virtual environment you just created with:
@@ -36,5 +42,5 @@ streamlit run app.py
 Else, if you are using another version for packages from the one you created the venv use>
 
 ```sh
-python -m streamlit run app.py
+py -m streamlit run app.py
 ```
