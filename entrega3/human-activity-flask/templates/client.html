@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detección de Posturas en Tiempo Real</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .video-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .video-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 100%;
+        }
+        
+        #videoElement {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+        }
+        
+        #canvasElement {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .controls {
+            margin-top: 20px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-stop {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E88);
+        }
+        
+        .btn-start {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+        }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .info-panel h3 {
+            margin-top: 0;
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .prediction-display {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .activity-label {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFE66D;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ECDC4, #44A08D);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .confidence-text {
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+        
+        .statistics {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .activity-classes {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .class-item {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active { background: #4ECDC4; }
+        .status-inactive { background: #FF6B6B; }
+        .status-processing { background: #FFE66D; }
+        
+        .loading {
+            text-align: center;
+            font-size: 1.1em;
+            opacity: 0.7;
+        }
+        
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #FF6B6B;
+            color: #FFE6E6;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .success-message {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid #4ECDC4;
+            color: #E6FFFE;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+        
+
+        
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Detección de Posturas en Tiempo Real</h1>
+            <p>Sistema de reconocimiento usando tu propia cámara web</p>
+        </div>
+        
+        <div id="errorContainer"></div>
+        
+        <div class="main-content">
+            <div class="video-section">
+                <h3>📹 Tu Cámara Web</h3>
+                <div class="video-container">
+                    <video id="videoElement" autoplay muted></video>
+                    <canvas id="canvasElement"></canvas>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-start" id="startBtn" onclick="startCamera()">🎥 Iniciar Cámara</button>
+                    <button class="btn btn-stop" id="stopBtn" onclick="stopCamera()" disabled>⏹️ Detener</button>
+                    <button class="btn" id="analyzeBtn" onclick="toggleAnalysis()" disabled>🔍 Iniciar Análisis</button>
+                </div>
+                <div id="cameraStatus" class="loading">Presiona "Iniciar Cámara" para comenzar</div>
+            </div>
+            
+            <div class="info-panel">
+                <h3>📊 Información en Tiempo Real</h3>
+                
+                <div class="prediction-display">
+                    <div class="activity-label" id="activityLabel">Esperando análisis...</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill"></div>
+                    </div>
+                    <div class="confidence-text" id="confidenceText">Confianza: 0%</div>
+                </div>
+                
+                <div class="statistics">
+                    <h4>📈 Estadísticas</h4>
+                    <div class="stat-item">
+                        <span>Estado del Sistema:</span>
+                        <span><span class="status-indicator status-inactive" id="systemStatus"></span><span id="statusText">Inactivo</span></span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Última Detección:</span>
+                        <span id="lastUpdate">--</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Detecciones Totales:</span>
+                        <span id="detectionCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>FPS de Análisis:</span>
+                        <span id="analysisRate">0</span>
+                    </div>
+                </div>
+                
+                <div class="activity-classes">
+                    <h4>🏃‍♂️ Actividades Detectables</h4>
+                    <div class="class-item">🚶‍♀️ Caminando</div>
+                    <div class="class-item">👏 Aplaudiendo</div>
+                    <div class="class-item">🤝 Encontrándose y separándose</div>
+                    <div class="class-item">💺 Sentado</div>
+                    <div class="class-item">🧍 De pie quieto</div>
+                    <div class="class-item">📱 Caminando usando teléfono</div>
+                    <div class="class-item">📚 Caminando leyendo libro</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let video = null;
+        let canvas = null;
+        let ctx = null;
+        let stream = null;
+        let analysisInterval = null;
+        let detectionCount = 0;
+        let isAnalyzing = false;
+        let lastAnalysisTime = 0;
+        let fps = 0;
+        
+        // Variables to track previous values and reduce flicker
+        let previousActivity = '';
+        let previousConfidence = 0;
+        let lastUIUpdate = 0;
+        let stableDetectionCount = 0;
+        const UI_UPDATE_INTERVAL = 500; // Update UI every 500ms max
+        const CONFIDENCE_THRESHOLD = 0.05; // Only update if confidence changes by 5%
+        
+        // MediaPipe pose connections for drawing
+        const POSE_CONNECTIONS = [
+            [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],  // Arms
+            [11, 23], [12, 24], [23, 24],  // Torso
+            [23, 25], [25, 27], [24, 26], [26, 28],  // Legs
+            [0, 1], [1, 2], [2, 3], [3, 7], [0, 4], [4, 5], [5, 6], [6, 8],  // Face
+            [9, 10]  // Face center
+        ];
+        
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = '<div class="error-message">' + message + '</div>';
+            setTimeout(() => {
+                errorContainer.innerHTML = '';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = '<div class="success-message">' + message + '</div>';
+            setTimeout(() => {
+                errorContainer.innerHTML = '';
+            }, 3000);
+        }
+        
+        function updateStatus(status, text) {
+            const statusIndicator = document.getElementById('systemStatus');
+            const statusText = document.getElementById('statusText');
+            statusIndicator.className = 'status-indicator status-' + status;
+            statusText.textContent = text;
+        }
+        
+        async function startCamera() {
+            try {
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const analyzeBtn = document.getElementById('analyzeBtn');
+                const cameraStatus = document.getElementById('cameraStatus');
+                
+                startBtn.disabled = true;
+                cameraStatus.textContent = 'Solicitando acceso a la cámara...';
+                cameraStatus.classList.add('pulse');
+                
+                // Get video element and canvas
+                video = document.getElementById('videoElement');
+                canvas = document.getElementById('canvasElement');
+                ctx = canvas.getContext('2d');
+                
+                // Request camera access
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: false
+                });
+                
+                video.srcObject = stream;
+                
+                video.onloadedmetadata = () => {
+                    // Set canvas size to match video
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    showSuccess('¡Cámara iniciada correctamente!');
+                    cameraStatus.textContent = 'Cámara activa - Lista para análisis';
+                    cameraStatus.classList.remove('pulse');
+                    
+                    updateStatus('active', 'Cámara Activa');
+                    
+                    stopBtn.disabled = false;
+                    analyzeBtn.disabled = false;
+                    startBtn.textContent = '🎥 Cámara Activa';
+                };
+                
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                showError('Error al acceder a la cámara: ' + error.message);
+                
+                const cameraStatus = document.getElementById('cameraStatus');
+                cameraStatus.textContent = 'Error al acceder a la cámara';
+                cameraStatus.classList.remove('pulse');
+                
+                document.getElementById('startBtn').disabled = false;
+                updateStatus('inactive', 'Error');
+            }
+        }
+        
+        function stopCamera() {
+            if (analysisInterval) {
+                clearInterval(analysisInterval);
+                analysisInterval = null;
+                isAnalyzing = false;
+            }
+            
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            if (video) {
+                video.srcObject = null;
+            }
+            
+            if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const cameraStatus = document.getElementById('cameraStatus');
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = '🔍 Iniciar Análisis';
+            startBtn.textContent = '🎥 Iniciar Cámara';
+            
+            cameraStatus.textContent = 'Cámara detenida';
+            updateStatus('inactive', 'Inactivo');
+            
+            // Reset prediction display
+            document.getElementById('activityLabel').textContent = 'Cámara detenida';
+            document.getElementById('confidenceFill').style.width = '0%';
+            document.getElementById('confidenceText').textContent = 'Confianza: 0%';
+            
+            showSuccess('Cámara detenida correctamente');
+        }
+        
+        function toggleAnalysis() {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            
+            if (!isAnalyzing) {
+                startAnalysis();
+                analyzeBtn.textContent = '⏸️ Detener Análisis';
+                updateStatus('processing', 'Analizando');
+            } else {
+                stopAnalysis();
+                analyzeBtn.textContent = '🔍 Iniciar Análisis';
+                updateStatus('active', 'Cámara Activa');
+            }
+        }
+        
+        function startAnalysis() {
+            if (!video || !canvas) return;
+            
+            isAnalyzing = true;
+            
+            analysisInterval = setInterval(() => {
+                if (video.readyState === 4) {
+                    captureAndAnalyze();
+                }
+            }, 500); // Reduced frequency to 500ms (2 FPS) for more stable results
+            
+            showSuccess('Análisis iniciado');
+        }
+        
+        function stopAnalysis() {
+            isAnalyzing = false;
+            
+            if (analysisInterval) {
+                clearInterval(analysisInterval);
+                analysisInterval = null;
+            }
+            
+            if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            showSuccess('Análisis detenido');
+        }
+        
+        function captureAndAnalyze() {
+            if (!video || !canvas || !isAnalyzing) return;
+            
+            try {
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = video.videoWidth;
+                tempCanvas.height = video.videoHeight;
+                
+                tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+                
+                const dataURL = tempCanvas.toDataURL('image/jpeg', 0.8);
+                
+                fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: dataURL })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    handleAnalysisResult(data);
+                })
+                .catch(error => {
+                    console.error('Error in analysis:', error);
+                });
+                
+                // Calculate FPS less frequently for stable display
+                const now = Date.now();
+                if (lastAnalysisTime > 0) {
+                    const timeDiff = now - lastAnalysisTime;
+                    fps = Math.round(1000 / timeDiff * 10) / 10;
+                    
+                    // Update FPS display every 2 seconds to reduce flicker
+                    if (now % 2000 < 500) {
+                        document.getElementById('analysisRate').textContent = fps.toFixed(1);
+                    }
+                }
+                lastAnalysisTime = now;
+                
+            } catch (error) {
+                console.error('Error capturing frame:', error);
+            }
+        }
+        
+        function handleAnalysisResult(data) {
+            const now = Date.now();
+            
+            if (data.pose_detected && data.activity && data.confidence) {
+                // Only update UI if enough time has passed or if there's a significant change
+                const confidenceChange = Math.abs(data.confidence - previousConfidence);
+                const shouldUpdateUI = (
+                    now - lastUIUpdate > UI_UPDATE_INTERVAL ||
+                    data.activity !== previousActivity ||
+                    confidenceChange > CONFIDENCE_THRESHOLD
+                );
+                
+                if (shouldUpdateUI) {
+                    const hasActivityChanged = data.activity !== previousActivity;
+                    updatePredictionDisplay(data.activity, data.confidence, hasActivityChanged);
+                    
+                    previousActivity = data.activity;
+                    previousConfidence = data.confidence;
+                    lastUIUpdate = now;
+                    
+                    // Update statistics less frequently
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                }
+                
+                // Always draw pose landmarks for smooth visual feedback
+                if (data.landmarks) {
+                    drawPoseLandmarks(data.landmarks);
+                }
+                
+                // Only increment detection count for stable detections
+                stableDetectionCount++;
+                if (stableDetectionCount % 3 === 0) { // Update count every 3 detections
+                    detectionCount++;
+                    document.getElementById('detectionCount').textContent = detectionCount;
+                }
+                
+            } else {
+                // Clear canvas if no pose detected
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                
+                // Reset activity if no detection for a while
+                if (now - lastUIUpdate > 2000) { // 2 seconds
+                    document.getElementById('activityLabel').textContent = 'Sin detección de postura';
+                    document.getElementById('confidenceFill').style.width = '0%';
+                    document.getElementById('confidenceText').textContent = 'Confianza: 0%';
+                    previousActivity = '';
+                    previousConfidence = 0;
+                }
+            }
+        }
+        
+        function drawPoseLandmarks(landmarks) {
+            if (!ctx || !landmarks) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.strokeStyle = '#00FF00';
+            ctx.lineWidth = 2;
+            
+            POSE_CONNECTIONS.forEach(([startIdx, endIdx]) => {
+                if (startIdx < landmarks.length && endIdx < landmarks.length) {
+                    const startPoint = landmarks[startIdx];
+                    const endPoint = landmarks[endIdx];
+                    
+                    if (startPoint.visibility > 0.5 && endPoint.visibility > 0.5) {
+                        ctx.beginPath();
+                        ctx.moveTo(startPoint.x * width, startPoint.y * height);
+                        ctx.lineTo(endPoint.x * width, endPoint.y * height);
+                        ctx.stroke();
+                    }
+                }
+            });
+            
+            ctx.fillStyle = '#FF0000';
+            landmarks.forEach(landmark => {
+                if (landmark.visibility > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(landmark.x * width, landmark.y * height, 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            });
+        }
+        
+        function updatePredictionDisplay(activity, confidence, hasActivityChanged = false) {
+            const activityLabel = document.getElementById('activityLabel');
+            const confidenceFill = document.getElementById('confidenceFill');
+            const confidenceText = document.getElementById('confidenceText');
+            
+            const translations = {
+                'clapping': '👏 Aplaudiendo',
+                'meeting_and_splitting': '🤝 Encontrándose y separándose',
+                'sitting': '💺 Sentado',
+                'standing_still': '🧍 De pie quieto',
+                'walking': '🚶‍♀️ Caminando',
+                'walking_while_reading_book': '📚 Caminando leyendo libro',
+                'walking_while_using_phone': '📱 Caminando usando teléfono'
+            };
+            
+            const translatedActivity = translations[activity] || activity;
+            
+            // Only update text if activity changed
+            if (hasActivityChanged) {
+                activityLabel.textContent = translatedActivity;
+            }
+            
+            // Smooth confidence bar transition
+            const targetWidth = (confidence * 100);
+            confidenceFill.style.width = targetWidth + '%';
+            confidenceText.textContent = 'Confianza: ' + targetWidth.toFixed(1) + '%';
+        }
+        
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showError('Tu navegador no soporta acceso a la cámara. Usa Chrome, Firefox o Safari.');
+            document.getElementById('startBtn').disabled = true;
+        }
+        
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && isAnalyzing) {
+                stopAnalysis();
+            }
+        });
+        
+        window.addEventListener('beforeunload', function() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>

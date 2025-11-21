@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detección de Posturas en Tiempo Real</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+        
+        .mode-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .video-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .video-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        #videoStream {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .controls {
+            margin-top: 20px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-stop {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E88);
+        }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .info-panel h3 {
+            margin-top: 0;
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .prediction-display {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .activity-label {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFE66D;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ECDC4, #44A08D);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .confidence-text {
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+        
+        .statistics {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .activity-classes {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .class-item {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active { background: #4ECDC4; }
+        .status-inactive { background: #FF6B6B; }
+        
+        .loading {
+            text-align: center;
+            font-size: 1.1em;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤸‍♀️ Detección de Posturas en Tiempo Real</h1>
+            <p>Sistema de reconocimiento de actividades humanas usando MediaPipe e IA</p>
+            
+            <div class="mode-selector">
+                <a href="/" class="mode-btn active">🖥️ Cámara del Servidor</a>
+                <a href="/client" class="mode-btn">📱 Cámara del Cliente</a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="video-section">
+                <h3>📹 Transmisión en Vivo</h3>
+                <div class="video-container">
+                    <img id="videoStream" src="/video_feed" alt="Video Stream" />
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="startCamera()">🎥 Iniciar Cámara</button>
+                    <button class="btn btn-stop" onclick="stopCamera()">⏹️ Detener</button>
+                </div>
+            </div>
+            
+            <div class="info-panel">
+                <h3>📊 Información en Tiempo Real</h3>
+                
+                <div class="prediction-display fade-in">
+                    <div class="activity-label" id="activityLabel">Esperando detección...</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill"></div>
+                    </div>
+                    <div class="confidence-text" id="confidenceText">Confianza: 0%</div>
+                </div>
+                
+                <div class="statistics">
+                    <h4>📈 Estadísticas</h4>
+                    <div class="stat-item">
+                        <span>Estado del Sistema:</span>
+                        <span><span class="status-indicator status-active" id="systemStatus"></span>Activo</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Última Actualización:</span>
+                        <span id="lastUpdate">--</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Detecciones Totales:</span>
+                        <span id="detectionCount">0</span>
+                    </div>
+                </div>
+                
+                <div class="activity-classes">
+                    <h4>🏃‍♂️ Actividades Detectables</h4>
+                    <div class="class-item">🚶‍♀️ Caminando</div>
+                    <div class="class-item">👏 Aplaudiendo</div>
+                    <div class="class-item">🤝 Encontrándose y separándose</div>
+                    <div class="class-item">💺 Sentado</div>
+                    <div class="class-item">🧍 De pie quieto</div>
+                    <div class="class-item">📱 Caminando usando teléfono</div>
+                    <div class="class-item">📚 Caminando leyendo libro</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let detectionCount = 0;
+        let predictionInterval;
+        
+        function startCamera() {
+            document.getElementById('systemStatus').className = 'status-indicator status-active';
+            
+            // Start polling for predictions
+            if (predictionInterval) {
+                clearInterval(predictionInterval);
+            }
+            
+            predictionInterval = setInterval(fetchPrediction, 1000);
+            
+            // Reload video stream
+            const videoStream = document.getElementById('videoStream');
+            videoStream.src = '/video_feed?' + new Date().getTime();
+        }
+        
+        function stopCamera() {
+            document.getElementById('systemStatus').className = 'status-indicator status-inactive';
+            
+            if (predictionInterval) {
+                clearInterval(predictionInterval);
+                predictionInterval = null;
+            }
+            
+            // Stop video feed
+            fetch('/stop_camera')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Camera stopped:', data);
+                    document.getElementById('activityLabel').textContent = 'Cámara detenida';
+                    document.getElementById('confidenceFill').style.width = '0%';
+                    document.getElementById('confidenceText').textContent = 'Confianza: 0%';
+                })
+                .catch(error => {
+                    console.error('Error stopping camera:', error);
+                });
+        }
+        
+        function fetchPrediction() {
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.activity && data.confidence) {
+                    updatePredictionDisplay(data.activity, data.confidence);
+                    detectionCount++;
+                    document.getElementById('detectionCount').textContent = detectionCount;
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                } else if (data.error) {
+                    console.log('Prediction error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching prediction:', error);
+            });
+        }
+        
+        function updatePredictionDisplay(activity, confidence) {
+            const activityLabel = document.getElementById('activityLabel');
+            const confidenceFill = document.getElementById('confidenceFill');
+            const confidenceText = document.getElementById('confidenceText');
+            
+            // Translate activity names to Spanish
+            const translations = {
+                'clapping': '👏 Aplaudiendo',
+                'meeting_and_splitting': '🤝 Encontrándose y separándose',
+                'sitting': '💺 Sentado',
+                'standing_still': '🧍 De pie quieto',
+                'walking': '🚶‍♀️ Caminando',
+                'walking_while_reading_book': '📚 Caminando leyendo libro',
+                'walking_while_using_phone': '📱 Caminando usando teléfono'
+            };
+            
+            const translatedActivity = translations[activity] || activity;
+            
+            activityLabel.textContent = translatedActivity;
+            confidenceFill.style.width = (confidence * 100) + '%';
+            confidenceText.textContent = `Confianza: ${(confidence * 100).toFixed(1)}%`;
+            
+            // Add animation effect
+            activityLabel.classList.remove('fade-in');
+            void activityLabel.offsetWidth; // Trigger reflow
+            activityLabel.classList.add('fade-in');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            startCamera();
+        });
+        
+        // Handle page visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                if (predictionInterval) {
+                    clearInterval(predictionInterval);
+                }
+            } else {
+                if (predictionInterval) {
+                    predictionInterval = setInterval(fetchPrediction, 1000);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
