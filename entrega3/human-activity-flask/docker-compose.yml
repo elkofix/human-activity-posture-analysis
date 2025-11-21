@@ -1,0 +1,29 @@
+# Docker Compose file for Human Activity Recognition Flask App
+version: '3.8'
+
+services:
+  human-activity-app:
+    build: .
+    container_name: human-activity-recognition
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=false
+      - LIBGL_ALWAYS_SOFTWARE=1
+    volumes:
+      # Mount models directory to persist model files
+      - ./models:/app/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - human-activity-net
+
+networks:
+  human-activity-net:
+    driver: bridge
